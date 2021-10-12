@@ -1,0 +1,77 @@
+<html>
+<head>
+  <link rel="stylesheet" href="styleup.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+    <!-- Or: -->
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script>
+  </head>
+  <body>
+    <div class="color-white">
+      <p id='account'></p>
+    </div>
+<div class="box">
+  <h2>SafeMedBChain</h2>
+  <br>
+  <form onSubmit="App1.registerSeller(); return false;">
+	<br>
+    <div class="inputBox">
+      <input type="text" name="username" id="username" required onkeyup="this.setAttribute('value', this.value);" required value="">
+      <label>Company ID</label>
+    </div> 
+	<div class="inputBox">
+      <input type="text" name="sellername" id="sellername" required value=""
+             onkeyup="this.setAttribute('value', this.value);">
+      <label>Name</label>
+    </div>
+	<div class="inputBox">
+      <input type="text" name="address" id="address" required value=""
+             onkeyup="this.setAttribute('value', this.value);">
+      <label>Address</label>
+	  <div class="inputBox">
+      <input type="text" name="assmanf" id="assmanf" required value=""
+             onkeyup="this.setAttribute('value', this.value);">
+      <label>Associated Manufacturer</label>
+    </div>
+    <div class="inputBox">
+      <input type="password" name="password" id="password" required value=""
+             onkeyup="this.setAttribute('value', this.value);">
+      <label>Password</label>
+    </div>
+	<p style="color:white;display:inline-block">Already a User?</p>
+	<a style="color:#03a9f4;text-decoration:none" href="Login.html">Login</a>
+	<div class="align-center">
+	<br>
+    <input type="submit" name="register" value="Register">
+	</div>
+  </form>
+</div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+    <script src="app.js"></script>
+    <script>
+      App1={
+        registerSeller: async()=>{
+          const username=$('#username').val()
+          const manfname=$('#sellername').val()
+          const address=$('#address').val()
+          const password=$('#password').val()
+          const assmanf=$('#assmanf').val()
+          await App.DrugCounterfiet.registerSeller(username,manfname,address,assmanf,password)
+          const man = await App.DrugCounterfiet.sellers(username)
+          const pass = man[3]
+          if(pass == ""){
+            alert("Incorrect Details")
+            window.location.reload()
+          }
+          else {
+            window.location.href="index.html"
+          }
+        },
+      }
+    </script>
+</body>
+</html>
