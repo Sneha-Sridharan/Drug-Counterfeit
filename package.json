@@ -12,6 +12,10 @@
     },
     "author": "gregory@dappuniversity.com",
     "license": "ISC",
+    "dependencies": {
+      "crypto-js": "^3.1.9-1",
+      "crypto": "^0.0.3"
+    },
     "devDependencies": {
       "bootstrap": "4.1.3",
       "chai": "^4.1.2",

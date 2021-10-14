@@ -36,6 +36,7 @@ option {
 					<option disabled selected value> ---- Select User Type ---- </option>
 					<option value="manufacturer">Manufacturer</option>
 					<option value="seller">Seller</option>
+					<option value="admin">Admin</option>
 				</select>
     </div>
 	  <br>
@@ -74,10 +75,19 @@ option {
           else if(usertype=="seller"){
             type=2
           }
+          else if(usertype=="admin"){
+            type=3
+          }
           const value = await App.DrugCounterfiet.login(username,type,password)
           console.log(value)
-          if(value == true){
+          if(value == true && usertype == "manufacturer"){
             window.location.href="Add_Seller.html"
+          }
+          else if(value == true && usertype == "seller"){
+            window.location.href="Add_Seller.html"
+          }
+          else if(value == true && usertype == "admin"){
+            window.location.href="Add_Manufacturer.html"
           }
           else {
             alert("Incorrect Details")

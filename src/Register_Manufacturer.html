@@ -1,5 +1,6 @@
 <html>
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
   <link rel="stylesheet" href="styleup.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
@@ -19,6 +20,10 @@
     <div class="inputBox">
       <input type="text" name="username" id="username" required onkeyup="this.setAttribute('value', this.value);" required value="">
       <label>Company ID</label>
+    </div> 
+    <div class="inputBox">
+      <input type="text" name="verifId" id="verifId" required onkeyup="this.setAttribute('value', this.value);" required value="">
+      <label>Verification ID</label>
     </div> 
 	<div class="inputBox">
       <input type="text" name="manfname" id="manfname" required value=""
@@ -50,20 +55,35 @@
     <script src="app.js"></script>
     <script>
       App1={
+        encryptWithAES: (text) => {
+          const passphrase = "gPs"
+          return CryptoJS.AES.encrypt(text, passphrase).toString()
+        },
+        decryptWithAES: (ciphertext) => {
+          const passphrase = "gPs";
+          const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+          const originalText = bytes.toString(CryptoJS.enc.Utf8);
+          return originalText;
+        },
+
         registerManufacturer: async()=>{
           const username=$('#username').val()
           const manfname=$('#manfname').val()
           const address=$('#address').val()
           const password=$('#password').val()
-          await App.DrugCounterfiet.registerMan(username,manfname,address,password)
+          var password1=App1.encryptWithAES(password)
+          const verifId=$('#verifId').val()
           const man = await App.DrugCounterfiet.manufacturers(username)
-          const pass = man[2]
-          if(pass == ""){
-            alert("Incorrect Details")
-            window.location.reload()
+          const retVerId=App1.decryptWithAES(man[0])
+          const retName=App1.decryptWithAES(man[1])
+          const retAddress=App1.decryptWithAES(man[2])
+          if(retVerId==verifId && retName==manfname && retAddress==address) {
+            await App.DrugCounterfiet.registerMan(username, password1)
+            window.location.href="index.html"
           }
           else {
-            window.location.href="index.html"
+            alert("Incorrect Details")
+            window.location.reload()
           }
         },
       }
