@@ -59,6 +59,7 @@
           const passphrase = "gPs"
           return CryptoJS.AES.encrypt(text, passphrase).toString()
         },
+        
         decryptWithAES: (ciphertext) => {
           const passphrase = "gPs";
           const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);

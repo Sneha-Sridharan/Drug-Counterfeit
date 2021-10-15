@@ -57,31 +57,10 @@ contract DrugCounterfiet
         emit Registered(_password,msg.sender);
     }
 
-    function registerSeller(uint _regid, string memory _name, string memory _location, uint _manId, string memory _password) public{
-        if(keccak256(bytes(sellers[_regid].name)) == keccak256(bytes(_name)) && keccak256(bytes(sellers[_regid].location)) == keccak256(bytes(_location)) && sellers[_regid].manId == _manId) {
-            sellers[_regid].password=_password;
-            sellers[_regid].sellAddress=msg.sender;
-            emit Registered(_password,msg.sender);
-        }
-    }
-
-    function login(uint _regid, uint _type, string memory _password) public view returns(bool){
-        if(_type==1) {
-            if(keccak256(bytes(manufacturers[_regid].password))==keccak256(bytes(_password)) && manufacturers[_regid].manAddress==msg.sender) {
-                return true;
-            }
-        }
-        else if(_type==2) {
-            if(keccak256(bytes(sellers[_regid].password))==keccak256(bytes(_password)) && sellers[_regid].sellAddress==msg.sender) {
-                return true;
-            }
-        }
-        else {
-            if(keccak256(bytes("1004101s1003101p0509101g"))==keccak256(bytes(_password)) && _regid==1931128) {
-                return true;
-            }
-        }
-        return false;
+    function registerSeller(uint _regid, string memory _password) public{
+        sellers[_regid].password=_password;
+        sellers[_regid].sellAddress=msg.sender;
+        emit Registered(_password,msg.sender);
     }
 
 }

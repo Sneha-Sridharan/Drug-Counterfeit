@@ -1,5 +1,6 @@
 <html>
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
   <link rel="stylesheet" href="styleup.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
@@ -64,34 +65,49 @@ option {
     <script src="app.js"></script>
     <script>
       App1={
+        decryptWithAES: (ciphertext) => {
+          const passphrase = "gPs";
+          const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+          const originalText = bytes.toString(CryptoJS.enc.Utf8);
+          return originalText;
+        },
+
         login: async()=>{
           const usertype=$('#type').val()
           const username=$('#username').val()
           const password=$('#password').val()
-          var type;
+          const account=$('#account').text()
           if(usertype=="manufacturer"){
-            type=1
+            const man = await App.DrugCounterfiet.manufacturers(username)
+            const retPassword=App1.decryptWithAES(man[3])
+            if(password==retPassword && man[4]==account){
+              window.location.href="Add_Seller.html"
+            }
+            else {
+              alert("Incorrect Details")
+              window.location.reload()
+            }
           }
           else if(usertype=="seller"){
-            type=2
+            const sell = await App.DrugCounterfiet.sellers(username)
+            const retPassword=App1.decryptWithAES(sell[3])
+            console.log(retPassword)
+            if(password==retPassword && sell[4]==account){
+              window.location.href="Register_Seller.html"
+            }
+            else {
+              alert("Incorrect Details")
+              window.location.reload()
+            }
           }
           else if(usertype=="admin"){
-            type=3
-          }
-          const value = await App.DrugCounterfiet.login(username,type,password)
-          console.log(value)
-          if(value == true && usertype == "manufacturer"){
-            window.location.href="Add_Seller.html"
-          }
-          else if(value == true && usertype == "seller"){
-            window.location.href="Add_Seller.html"
-          }
-          else if(value == true && usertype == "admin"){
-            window.location.href="Add_Manufacturer.html"
-          }
-          else {
-            alert("Incorrect Details")
-            window.location.reload()
+            if(password=="1004101s1003101p0509101g" && username==1931128){
+              window.location.href="Add_Manufacturer.html"
+            }
+            else {
+              alert("Incorrect Details")
+              window.location.reload()
+            }
           }
         },
       }

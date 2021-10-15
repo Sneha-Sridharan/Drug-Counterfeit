@@ -1,5 +1,6 @@
 <html>
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
   <link rel="stylesheet" href="styleup.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
@@ -54,21 +55,36 @@
     <script src="app.js"></script>
     <script>
       App1={
+        encryptWithAES: (text) => {
+          const passphrase = "gPs"
+          return CryptoJS.AES.encrypt(text, passphrase).toString()
+        },
+        
+        decryptWithAES: (ciphertext) => {
+          const passphrase = "gPs";
+          const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+          const originalText = bytes.toString(CryptoJS.enc.Utf8);
+          return originalText;
+        },
+
         registerSeller: async()=>{
           const username=$('#username').val()
-          const manfname=$('#sellername').val()
+          const sellname=$('#sellername').val()
           const address=$('#address').val()
           const password=$('#password').val()
           const assmanf=$('#assmanf').val()
-          await App.DrugCounterfiet.registerSeller(username,manfname,address,assmanf,password)
-          const man = await App.DrugCounterfiet.sellers(username)
-          const pass = man[3]
-          if(pass == ""){
-            alert("Incorrect Details")
-            window.location.reload()
+          var password1=App1.encryptWithAES(password)
+          const sell = await App.DrugCounterfiet.sellers(username)
+          const retName=App1.decryptWithAES(sell[0])
+          const retAddress=App1.decryptWithAES(sell[1])
+          const retManId=sell[2]
+          if(retName==sellname && retAddress==address && retManId==assmanf) {
+            await App.DrugCounterfiet.registerSeller(username, password1)
+            window.location.href="index.html"
           }
           else {
-            window.location.href="index.html"
+            alert("Incorrect Details")
+            window.location.reload()
           }
         },
       }

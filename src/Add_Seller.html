@@ -1,5 +1,6 @@
 <html>
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
@@ -12,7 +13,7 @@
     <p id='account'></p>
   </div>
   <div class="box">
-  <h2>Add Seller</h2>
+  <h2>ADD SELLER</h2>
   <form onSubmit="App1.createSeller(); return false;">
 	<div class="inputBox">
       <input type="text" name="username" id="username" required onkeyup="this.setAttribute('value', this.value);" value="">
@@ -28,9 +29,10 @@
     </div>
     
     
-	<div>
-    <input type="submit" name="Add" value="Add">
-	</div>
+    <div class="align-center">
+      <br>
+      <input type="submit" name="add" value="ADD">
+    </div>
 	<br />
 	
 	
@@ -43,11 +45,18 @@
     <script src="app.js"></script>
     <script>
       App1={
+        encryptWithAES: (text) => {
+          const passphrase = "gPs"
+          return CryptoJS.AES.encrypt(text, passphrase).toString()
+        },
+
         createSeller: async()=>{
           const username=$('#username').val()
           const name=$('#name').val()
+          var name1=App1.encryptWithAES(name)
           const address=$('#address').val()
-          await App.DrugCounterfiet.createSeller(username,name,address,27637)
+          var address1=App1.encryptWithAES(address)
+          await App.DrugCounterfiet.createSeller(username,name1,address1,27637)
           alert("Seller Created")
           window.location.href="index.html"
         },

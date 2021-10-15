@@ -13,7 +13,7 @@
     <p id='account'></p>
   </div>
   <div class="box">
-  <h2>Add Manufacturer</h2>
+  <h2>ADD MANUFACTURER</h2>
   <form onSubmit="App1.createManufacturer(); return false;">
 	<div class="inputBox">
       <input type="text" name="username" id="username" required onkeyup="this.setAttribute('value', this.value);" value="">
@@ -33,9 +33,10 @@
     </div>
     
     
-	<div>
-    <input type="submit" name="Add" value="Add">
-	</div>
+    <div class="align-center">
+      <br>
+      <input type="submit" name="add" value="ADD">
+    </div>
 	<br />
 	
 	
@@ -61,7 +62,6 @@
           var address1=App1.encryptWithAES(address)
           const verifId=$('#verifId').val()
           var verifId1=App1.encryptWithAES(verifId)
-          console.log(verifId1,name1,address1);
           await App.DrugCounterfiet.createManufacturer(username,verifId1,name1,address1)
           alert("Manufacturer Created")
           window.location.href="index.html"
