@@ -56,7 +56,8 @@
           var name1=App1.encryptWithAES(name)
           const address=$('#address').val()
           var address1=App1.encryptWithAES(address)
-          await App.DrugCounterfiet.createSeller(username,name1,address1,27637)
+          var user=localStorage.getItem("loggedInUser");
+          await App.DrugCounterfiet.createSeller(username,name1,address1,user)
           alert("Seller Created")
           window.location.href="index.html"
         },
