@@ -1,0 +1,103 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+    <!-- Or: -->
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script>
+  <link rel="stylesheet" href="styleup2.css">
+</head>
+<body>
+  <div class="color-white">
+    <p id='account'></p>
+  </div>
+  <div class="box">
+  <h2>CREATE ORDER</h2>
+  <form onSubmit="App1.createOrder(); return false;">
+    <div class="input_fields_wrap">
+    <div class="inputBox">
+      <input type="text" name="drugName1" id="drugName1" required onkeyup="this.setAttribute('value', this.value);" value="">
+      <label>Drug Name</label>
+    </div> 
+     <div class="inputBox">
+      <input type="text" name="quantity1" id="quantity1" required onkeyup="this.setAttribute('value', this.value);" value="">
+      <label>Quantity</label>
+      <button class="add_field_button">+</button>
+    </div>
+    </div>
+    <div class="align-center">
+      <br>
+      <input type="submit" name="add" value="ADD">
+    </div>
+	<br />
+	
+	
+  </form>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+    <script>
+    $(document).ready(function() {
+        var max_fields      = 3; //maximum input boxes allowed
+        var wrapper   		= $(".input_fields_wrap"); //Fields wrapper
+        var add_button      = $(".add_field_button"); //Add button ID
+        
+        var x = 1; //initlal text box count
+        $(add_button).click(function(e){ //on add input button click
+            e.preventDefault();
+            if(x < max_fields){ //max input box allowed
+                x++; //text box increment
+                $(wrapper).append('<div><br><div class="inputBox"><input type="text" name="drugName'+x+'" id="drugName'+x+'" required value=""><label>Drug Name</label></div><div class="inputBox"><input type="text" name="quantity'+x+'" id="quantity'+x+'" required value=""><label>Price</label></div><a href="#" class="remove_field">Remove</a></div>');
+            }
+        });
+        
+        $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+            e.preventDefault(); $(this).parent('div').remove(); x--;
+         })
+       });
+    </script>
+    <script src="app.js"></script>
+    <script>
+      App1={
+        encryptWithAES: (text) => {
+          const passphrase = "gPs"
+          return CryptoJS.AES.encrypt(text, passphrase).toString()
+        },
+
+        createOrder: async()=>{
+          const drug1=$('#drugName1').val()
+          const quantity1=$('#quantity1').val()
+          const drug2=$('#drugName2').val()
+          const quantity2=$('#quantity2').val()
+          const drug3=$('#drugName3').val()
+          const quantity3=$('#quantity3').val()
+          var drug1en=App1.encryptWithAES(drug1);
+          var quantity1en=App1.encryptWithAES(quantity1);
+          var user=localStorage.getItem("loggedInUser");
+          var status=App1.encryptWithAES("Created");
+          const sell = await App.DrugCounterfiet.sellers(user)
+          const manId=sell[2].toNumber()
+          var id=Math.floor(Math.random() * 10000) + 10000;
+          console.log(id);
+          console.log(user,manId);
+          await App.DrugCounterfiet.createOrder(id,drug1en,quantity1en,status,manId,user);
+          if(drug2!=null) {
+            var drug2en=App1.encryptWithAES(drug2);
+            var quantity2en=App1.encryptWithAES(quantity2);
+            await App.DrugCounterfiet.createOrder(id,drug2en,quantity2en,status,manId,user);
+          }
+          if(drug3!=null) {
+            var drug3en=App1.encryptWithAES(drug3);
+            var quantity3en=App1.encryptWithAES(quantity3);
+            await App.DrugCounterfiet.createOrder(id,drug3en,quantity3en,status,manId,user);
+          }
+          alert("Order Created");
+          window.location.href="index.html";
+        },
+      }
+    </script>
+    </body>
+</html>

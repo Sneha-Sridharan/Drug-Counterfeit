@@ -81,6 +81,7 @@ option {
             const man = await App.DrugCounterfiet.manufacturers(username)
             const retPassword=App1.decryptWithAES(man[3])
             if(password==retPassword && man[4]==account){
+              localStorage.setItem("loggedInUser", username);
               window.location.href="Add_Seller.html"
             }
             else {
@@ -93,6 +94,7 @@ option {
             const retPassword=App1.decryptWithAES(sell[3])
             console.log(retPassword)
             if(password==retPassword && sell[4]==account){
+              localStorage.setItem("loggedInUser", username);
               window.location.href="Register_Seller.html"
             }
             else {
@@ -102,6 +104,7 @@ option {
           }
           else if(usertype=="admin"){
             if(password=="1004101s1003101p0509101g" && username==1931128){
+              localStorage.setItem("loggedInUser", username);
               window.location.href="Add_Manufacturer.html"
             }
             else {
