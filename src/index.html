@@ -82,7 +82,7 @@ option {
             const retPassword=App1.decryptWithAES(man[3])
             if(password==retPassword && man[4]==account){
               localStorage.setItem("loggedInUser", username);
-              window.location.href="Add_Seller.html"
+              window.location.href="Home_Page_Manufacturer.html"
             }
             else {
               alert("Incorrect Details")
@@ -95,7 +95,7 @@ option {
             console.log(retPassword)
             if(password==retPassword && sell[4]==account){
               localStorage.setItem("loggedInUser", username);
-              window.location.href="Register_Seller.html"
+              window.location.href="Home_Page_Seller.html"
             }
             else {
               alert("Incorrect Details")
@@ -105,7 +105,7 @@ option {
           else if(usertype=="admin"){
             if(password=="1004101s1003101p0509101g" && username==1931128){
               localStorage.setItem("loggedInUser", username);
-              window.location.href="Add_Manufacturer.html"
+              window.location.href="Home_Page_Admin.html"
             }
             else {
               alert("Incorrect Details")

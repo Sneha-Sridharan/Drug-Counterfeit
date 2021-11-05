@@ -13,7 +13,7 @@
     <p id='account'></p>
   </div>
   <div class="box">
-  <h2>CREATE ORDER</h2>
+  <h2>PLACE ORDER</h2>
   <form onSubmit="App1.createOrder(); return false;">
     <div class="input_fields_wrap">
     <div class="inputBox">
@@ -85,17 +85,19 @@
           console.log(user,manId);
           await App.DrugCounterfiet.createOrder(id,drug1en,quantity1en,status,manId,user);
           if(drug2!=null) {
+            var id=Math.floor(Math.random() * 10000) + 10000;
             var drug2en=App1.encryptWithAES(drug2);
             var quantity2en=App1.encryptWithAES(quantity2);
             await App.DrugCounterfiet.createOrder(id,drug2en,quantity2en,status,manId,user);
           }
           if(drug3!=null) {
+            var id=Math.floor(Math.random() * 10000) + 10000;
             var drug3en=App1.encryptWithAES(drug3);
             var quantity3en=App1.encryptWithAES(quantity3);
             await App.DrugCounterfiet.createOrder(id,drug3en,quantity3en,status,manId,user);
           }
           alert("Order Created");
-          window.location.href="index.html";
+          window.location.href="Home_Page_Seller.html";
         },
       }
     </script>
