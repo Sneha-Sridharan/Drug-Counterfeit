@@ -1,0 +1,159 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <link rel="stylesheet" href="styleup.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+    <!-- Or: -->
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script><link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+  <style>
+    .dropbtn {
+      background-color: #03a9f4;
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+    }
+    option {
+      background-color: #000;
+      color: #fff;
+    }
+    .nav {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+    
+    li {
+      float: left;
+    }
+
+    .acc {
+      float: right;
+    }
+    
+    li a {
+      display: inline-block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+    
+    li a:hover {
+      background-color: #03a9f4;
+    }
+
+    li #account:hover {
+      background-color: #000;
+    }
+  
+    </style>
+    </head>
+  
+<body>
+  <ul class="nav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="Login.html">Login</a></li>
+    <li class="acc"><a id='account'></a></li>
+  </ul>
+<div class="box">
+  <h2>LOGIN</h2>
+  <br>
+  <form onSubmit="App1.login(); return false;">
+    <br>
+    <div class="inputBox" style="color:white">
+    	User Type
+				<select  class="dropbtn" id="type" name="type" style="margin-left: 53px;" required>
+					<option disabled selected value> ---- Select User Type ---- </option>
+					<option value="manufacturer">Manufacturer</option>
+					<option value="seller">Seller</option>
+					<option value="admin">Admin</option>
+				</select>
+    </div>
+	  <br>
+      <div class="inputBox">
+        <input type="text" name="username" id="username" required onkeyup="this.setAttribute('value', this.value);" required value="">
+        <label>Username</label>
+      </div> 
+    <div class="inputBox">
+        <input type="password" name="password" id="password" required value=""
+               onkeyup="this.setAttribute('value', this.value);">
+        <label>Password</label>
+      </div>
+      <p style="color:white;display:inline-block">New User?</p>
+      <a style="color:#03a9f4;text-decoration:none" href="Register.html">Register</a>
+      <div class="align-center">
+      <br>
+      <input type="submit" name="login" value="Login">
+    </div>
+    </form>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+    <script src="app.js"></script>
+    <script>
+      App1={
+        decryptWithAES: (ciphertext) => {
+          const passphrase = "gPs";
+          const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+          const originalText = bytes.toString(CryptoJS.enc.Utf8);
+          return originalText;
+        },
+
+        login: async()=>{
+          const usertype=$('#type').val()
+          const username=$('#username').val()
+          const password=$('#password').val()
+          const account=$('#account').text()
+          if(usertype=="manufacturer"){
+            const man = await App.DrugCounterfiet.manufacturers(username)
+            const retPassword=App1.decryptWithAES(man[3])
+            if(password==retPassword && man[4]==account){
+              localStorage.setItem("loggedInUser", username);
+              window.location.href="Home_Page_Manufacturer.html"
+            }
+            else {
+              alert("Incorrect Details")
+              window.location.reload()
+            }
+          }
+          else if(usertype=="seller"){
+            const sell = await App.DrugCounterfiet.sellers(username)
+            const retPassword=App1.decryptWithAES(sell[3])
+            console.log(retPassword)
+            if(password==retPassword && sell[4]==account){
+              localStorage.setItem("loggedInUser", username);
+              window.location.href="Home_Page_Seller.html"
+            }
+            else {
+              alert("Incorrect Details")
+              window.location.reload()
+            }
+          }
+          else if(usertype=="admin"){
+            if(password=="1004101s1003101p0509101g" && username==1931128){
+              localStorage.setItem("loggedInUser", username);
+              window.location.href="Home_Page_Admin.html"
+            }
+            else {
+              alert("Incorrect Details")
+              window.location.reload()
+            }
+          }
+        },
+      }
+      $(()=>{
+          $(window).load(()=>{
+            localStorage.clear();
+          })
+      })
+    </script>
+</body>
+</html>

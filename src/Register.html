@@ -1,69 +1,55 @@
-<!DOCTYPE html>
 <html>
 <head>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <link rel="stylesheet" href="styleup.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+    <!-- Or: -->
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script><link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
 <style>
-body {
-  margin: 0;
-  
-  background: url(https://wallpaperaccess.com/full/1267581.jpg);
-  background-size: cover;
- 
-
-}
-.container { 
-  height: 200px;
-  position: relative;
-  background : transparent;
-  
-
-}
-.button {
-  background-color: #4CAF50; /* Green */
-  border: none;
-  color: white;
-  padding: 50px 150px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  margin: 4px 2px;
-
-  cursor: pointer;
- background: transparent;
- background-color: rgba(0, 0, 0, 0.6);
-}
-
-.center {
-  margin: 0;
-  position: absolute;
-  padding: 14px 18px;
-  top: 120%;
-  left: 50%;
-  -ms-transform: translate(-50%, 50%);
-  transform: translate(-50%, -50%);
-
-}
-
-</style>
+  button {
+    border: none;
+    outline: none;
+    color: #fff;
+    width: 100%;
+    background-color: #03a9f4;
+    padding: 0.625rem 1.25rem;
+    cursor: pointer;
+    border-radius: 0.312rem;
+    font-size: 1rem;
+  }
+  a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+  .box {
+    width:30rem;
+  }
+</style>  
 </head>
-<body>
-
-
-<div class="container">
-
-  <div class="center">
-    <a class="button" href="Register_Manufacturer.html">Manufacturer</a>
-    
+  <body>
+    <div class="color-white">
+      <p id='account'></p>
+    </div>
+<div class="box">
+  <!-- <h1>SafeMedBChain</h1> -->
+  <h2>REGISTER AS</h2>
+  <br><br><br>
+  <div style="text-align: center;">
+      <button><a href="Register_Manufacturer.html">MANUFACTURER</a></button>
   </div>
-</div>
-
-<div class="container">
-  <div class="center">
-    <a class="button" href="Register_Seller.html">Seller</a>
-     
+  <br>
+  <br>
+  <div style="text-align: center;">
+    <button><a href="Register_Seller.html">SELLER</a></button>
   </div>
+  <br>
 </div>
-
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

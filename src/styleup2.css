@@ -6,6 +6,10 @@ body {
   font-family: 'Lato', sans-serif;
 }
 
+pre {
+  font-family: 'Lato', sans-serif;
+}
+
 .box {
   position: absolute;
   top: 50%;
@@ -19,6 +23,13 @@ body {
 }
 
 .box h2 {
+  margin: 0 0 1.875rem;
+  padding: 0;
+  color: #fff;
+  text-align: center;
+}
+
+.box h1 {
   margin: 0 0 1.875rem;
   padding: 0;
   color: #fff;

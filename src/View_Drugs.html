@@ -1,0 +1,157 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+    <!-- Or: -->
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script>
+  <link rel="stylesheet" href="styleup2.css">
+</head>
+<body>
+  <div class="color-white">
+    <p id='account'></p>
+  </div>
+  <div class="box">
+  <h2>VIEW DRUGS</h2>
+  <div id="loader">
+    <p style="color:white">Loading...</p>
+  </div>
+  <div id="content">
+    <ul id="orderList" class="list-unstyled">
+      <div class='orderTemplate' style="color:white">
+        <pre class='drugName'></pre>
+        <pre class='price'></pre>
+        <br>
+      </div>
+    </ul>
+  </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+    <script>
+      App={
+        loading:false,
+        contracts:{},
+          load: async()=>{
+              await App.loadWeb3()
+              await App.loadContract()
+              await App.render()
+          },
+          loadWeb3: async () => {
+              if (typeof web3 !== 'undefined') {
+                App.web3Provider = web3.currentProvider
+                web3 = new Web3(web3.currentProvider)
+              } else {
+                window.alert("Please connect to Metamask.")
+              }
+              // Modern dapp browsers...
+              if (window.ethereum) {
+                window.web3 = new Web3(ethereum)
+                try {
+                  // Request account access if needed
+                  await ethereum.enable()
+                  // Acccounts now exposed
+                  web3.eth.sendTransaction({/* ... */})
+                } catch (error) {
+                  // User denied account access...
+                }
+              }
+          // Legacy dapp browsers...
+              else if (window.web3) {
+                App.web3Provider = web3.currentProvider
+                window.web3 = new Web3(web3.currentProvider)
+                // Acccounts always exposed
+                web3.eth.sendTransaction({/* ... */})
+              }
+              // Non-dapp browsers...
+              else {
+                console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
+              }
+            },
+            loadContract: async ()=>{
+              const DrugCounterfiet= await $.getJSON('DrugCounterfiet.json')
+              App.contracts.DrugCounterfiet = TruffleContract(DrugCounterfiet)
+              App.contracts.DrugCounterfiet.setProvider(App.web3Provider)
+          
+              // Hydrate the smart contract with values from the blockchain
+              App.DrugCounterfiet = await App.contracts.DrugCounterfiet.deployed()
+            },
+            render:async()=>{
+              web3.eth.getCoinbase(function(err, account) {
+                if(err === null) {
+                  App.account = account;
+                  $('#account').html(App.account)
+                }
+              });
+              if(App.loading){
+                return
+              }
+              App.setLoading(true)
+              await App.renderDrugs()
+              App.setLoading(false)
+            },
+
+            encryptWithAES: (text) => {
+              const passphrase = "gPs"
+              return CryptoJS.AES.encrypt(text, passphrase).toString()
+            },
+
+            decryptWithAES: (ciphertext) => {
+              const passphrase = "gPs";
+              const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+              const originalText = bytes.toString(CryptoJS.enc.Utf8);
+              return originalText;
+            },
+
+            setLoading: (boolean) => {
+              App.loading = boolean
+              const loader = $('#loader')
+              const content = $('#content')
+              if (boolean) {
+                loader.show()
+                content.hide()
+              } else {
+                loader.hide()
+                content.show()
+              }
+            },
+
+            renderDrugs: async () => {
+            // Load the total task count from the blockchain
+              var user=localStorage.getItem("loggedInUser");
+              const sell = await App.DrugCounterfiet.sellers(user)
+              const manId=sell[2].toNumber()
+              const drugCount = await App.DrugCounterfiet.viewDrugsLength(manId)
+              var no=drugCount.toNumber();
+              const $drugTemplate = $('.orderTemplate')
+                // Render out each task with a new task template
+              for (var i = 0; i < no; i++) {
+                // Fetch the task data from the blockchain
+                var drug = await App.DrugCounterfiet.viewDrugs(manId,i)
+                var price = await App.DrugCounterfiet.viewPrice(manId,i)
+                drug=App.decryptWithAES(drug)
+                price=App.decryptWithAES(price)
+
+                // Create the html for the task
+                const $newDrugTemplate = $drugTemplate.clone()
+                $newDrugTemplate.find('.drugName').html("Drug Name:  "+drug)
+                $newDrugTemplate.find('.price').html("Price:   "+price)
+                // Put the task in the correct list
+                $('#orderList').append($newDrugTemplate)
+
+                // Show the task
+                $newDrugTemplate.show()
+              }
+            },
+      }
+      $(()=>{
+          $(window).load(()=>{
+              App.load()
+          })
+      })
+    </script>
+    </body>
+</html>

@@ -18,6 +18,13 @@ font-family: 'Lato', sans-serif;
   border-radius: 0.625rem;
 }
 
+.box h1 {
+  margin: 0 0 1.875rem;
+  padding: 0;
+  color: #fff;
+  text-align: center;
+}
+
 .box h2 {
   margin: 0 0 1.875rem;
   padding: 0;

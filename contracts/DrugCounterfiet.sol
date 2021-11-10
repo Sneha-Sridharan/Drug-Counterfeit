@@ -66,6 +66,11 @@ contract DrugCounterfiet
 		string price
     );
 
+    event orderUpdate(
+        string status,
+		string date
+    );
+
     function createManufacturer(uint _regid, string memory _verificationId, string memory _name, string memory _location) public{
         manufacturers[_regid].verificationId=_verificationId;
         manufacturers[_regid].name=_name;
@@ -136,6 +141,51 @@ contract DrugCounterfiet
 
     function viewDrugs(uint _regid, uint index) public view returns (string memory){
         return manufacturers[_regid].drugNames[index];
+    }
+
+    function viewPrice(uint _regid, uint index) public view returns (string memory){
+        return manufacturers[_regid].prices[index];
+    }
+
+    function acceptOrder(uint _regid, string memory _date, string memory _status) public{
+        orders[_regid].orderStatus = _status;
+        orders[_regid].orderManuDate = _date;
+        emit orderUpdate(_date,_status);
+    }
+
+    function rejectOrder(uint _regid, string memory _status, uint _id, uint _manId) public{
+        orders[_regid].orderStatus = _status;
+        emit orderUpdate("No Date",_status);
+        for (uint i = _id; i< manufacturers[_manId].ongoingOrders.length-1; i++){
+             manufacturers[_manId].ongoingOrders[i] =  manufacturers[_manId].ongoingOrders[i+1];
+        }
+        manufacturers[_manId].ongoingOrders.pop();
+        emit orderUpdate("No Date",_status);
+    }
+
+    function removeOrder(uint _regId, uint _id, uint _type) public{
+        if(_type==1) {  
+            for (uint i = _id; i< manufacturers[_regId].ongoingOrders.length-1; i++){
+                 manufacturers[_regId].ongoingOrders[i] =  manufacturers[_regId].ongoingOrders[i+1];
+            }
+            manufacturers[_regId].ongoingOrders.pop();
+        }
+        else {
+            for (uint i = _id; i< sellers[_regId].ongoingOrders.length-1; i++){
+                 sellers[_regId].ongoingOrders[i] =  sellers[_regId].ongoingOrders[i+1];
+            }
+            sellers[_regId].ongoingOrders.pop();
+        }
+    }
+
+    function orderDelivered(uint _id, uint _regid, string memory _date, string memory _status, uint _sellId) public{
+        orders[_regid].orderStatus = _status;
+        orders[_regid].orderDelvDate = _date;
+        for (uint i = _id; i< sellers[_sellId].ongoingOrders.length-1; i++){
+             sellers[_sellId].ongoingOrders[i] =  sellers[_sellId].ongoingOrders[i+1];
+        }
+        sellers[_sellId].ongoingOrders.pop();
+        emit orderUpdate(_date,_status);
     }
 
 }

@@ -1,62 +1,80 @@
 <html>
 <head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-  <link rel="stylesheet" href="styleup.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
     <!-- Or: -->
-    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script><link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script>
+  <link rel="stylesheet" href="styleup2.css">
   <style>
-.dropbtn {
-  background-color: #03a9f4;
-  color: white;
-  padding: 10px;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-}
-option {
-	background-color: #000;
-	color: #fff;
-}
-</style>
-  </head>
-  <body>
-    <div class="color-white">
-      <p id='account'></p>
-    </div>
-<div class="box">
-  <h2>SafeMedBChain</h2>
-  <br>
-  <form onSubmit="App1.login(); return false;">
-    <br>
-    <div class="inputBox" style="color:white">
-    	User Type
-				<select  class="dropbtn" id="type" name="type" style="margin-left: 53px;" required>
-					<option disabled selected value> ---- Select User Type ---- </option>
-					<option value="manufacturer">Manufacturer</option>
-					<option value="seller">Seller</option>
-					<option value="admin">Admin</option>
-				</select>
-    </div>
-	  <br>
-      <div class="inputBox">
-        <input type="text" name="username" id="username" required onkeyup="this.setAttribute('value', this.value);" required value="">
-        <label>Username</label>
-      </div> 
-    <div class="inputBox">
-        <input type="password" name="password" id="password" required value=""
-               onkeyup="this.setAttribute('value', this.value);">
-        <label>Password</label>
+    .nav {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+    
+    li {
+      float: left;
+    }
+
+    .acc {
+      float: right;
+    }
+    
+    li a {
+      display: inline-block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+    
+    li a:hover {
+      background-color: #03a9f4;
+    }
+
+    li #account:hover {
+      background-color: #000;
+    }
+  
+    </style>
+    </head>
+  
+<body>
+  <ul class="nav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="Login.html">Login</a></li>
+    <li class="acc"><a id='account'></a></li>
+  </ul>
+  <div class="box">
+  <h1>SafeMedBChain</h1>
+  <h2>TRACE ORDER</h2>
+  <form onSubmit="App1.renderOrder(); return false;">
+	<br>
+    <div class="inputBox" style="margin-right: 30px;width:80%;display: inline-block;">
+      <input type="text" name="serNo" id="serNo" required onkeyup="this.setAttribute('value', this.value);" required value="">
+      <label>Serial Number</label>
+    </div> 
+	<div class="align-center" style="display: inline-block">
+    <input type="submit" name="Search" value="Search">
+	</div>
+  </form>
+  <div id="content">
+    <ul id="orderList" class="list-unstyled">
+      <div class='orderTemplate' style="color:white">
+        <pre class='drugName'></pre>
+        <pre class='quantity'></pre>
+        <pre class='status'></pre>
+        <pre class='manDate'></pre>
+        <pre class='sellDate'></pre>
+        <pre class='manName'></pre>
+        <pre class='sellName'></pre>
       </div>
-      <p style="color:white;display:inline-block">New User?</p>
-      <a style="color:#03a9f4;text-decoration:none" href="Register.html">Register</a>
-      <div class="align-center">
-      <br>
-      <input type="submit" name="login" value="Login">
-    </div>
-    </form>
+    </ul>
+  </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -65,6 +83,7 @@ option {
     <script src="app.js"></script>
     <script>
       App1={
+
         decryptWithAES: (ciphertext) => {
           const passphrase = "gPs";
           const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
@@ -72,48 +91,39 @@ option {
           return originalText;
         },
 
-        login: async()=>{
-          const usertype=$('#type').val()
-          const username=$('#username').val()
-          const password=$('#password').val()
-          const account=$('#account').text()
-          if(usertype=="manufacturer"){
-            const man = await App.DrugCounterfiet.manufacturers(username)
-            const retPassword=App1.decryptWithAES(man[3])
-            if(password==retPassword && man[4]==account){
-              localStorage.setItem("loggedInUser", username);
-              window.location.href="Home_Page_Manufacturer.html"
+        renderOrder: async () => {
+            const $orderTemplate = $('.orderTemplate')
+            var orderId=$('#serNo').val()
+            orderId=orderId.substring(0, 5);
+            console.log(orderId);
+            const order = await App.DrugCounterfiet.orders(orderId)
+            const drug=App1.decryptWithAES(order[0])
+            const quant=App1.decryptWithAES(order[1])
+            const stat=App1.decryptWithAES(order[2])
+            const mand=App1.decryptWithAES(order[3])
+            const selld=App1.decryptWithAES(order[4])
+            const man=App1.decryptWithAES(order[5])
+            const sell=App1.decryptWithAES(order[6])
+
+                // Create the html for the task
+            const $newOrderTemplate = $orderTemplate.clone()
+            $newOrderTemplate.find('.drugName').html("Drug Name:  "+drug)
+            $newOrderTemplate.find('.quantity').html("Quantity:   "+quant)
+            $newOrderTemplate.find('.status').html("Status:   " +stat)
+            if(mand) {
+              $newOrderTemplate.find('.manDate').html("Manufacturing Date:   "+mand)
             }
-            else {
-              alert("Incorrect Details")
-              window.location.reload()
+            if(selld) {
+              $newOrderTemplate.find('.sellDate').html("Delivery to Seller Date:   "+selld)
             }
-          }
-          else if(usertype=="seller"){
-            const sell = await App.DrugCounterfiet.sellers(username)
-            const retPassword=App1.decryptWithAES(sell[3])
-            console.log(retPassword)
-            if(password==retPassword && sell[4]==account){
-              localStorage.setItem("loggedInUser", username);
-              window.location.href="Home_Page_Seller.html"
-            }
-            else {
-              alert("Incorrect Details")
-              window.location.reload()
-            }
-          }
-          else if(usertype=="admin"){
-            if(password=="1004101s1003101p0509101g" && username==1931128){
-              localStorage.setItem("loggedInUser", username);
-              window.location.href="Home_Page_Admin.html"
-            }
-            else {
-              alert("Incorrect Details")
-              window.location.reload()
-            }
-          }
+            $newOrderTemplate.find('.manName').html("Manufacturer Name:   "+man)
+            $newOrderTemplate.find('.sellName').html("Seller Name:   "+sell)
+            // Put the task in the correct list
+            $('#orderList').append($newOrderTemplate)
+            // Show the task
+            $newOrderTemplate.show()
         },
       }
     </script>
-</body>
+    </body>
 </html>

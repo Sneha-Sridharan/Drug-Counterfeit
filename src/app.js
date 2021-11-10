@@ -43,6 +43,7 @@ App={
       
           // Hydrate the smart contract with values from the blockchain
           App.DrugCounterfiet = await App.contracts.DrugCounterfiet.deployed()
+          console.log("hi");
         },
         render:async()=>{
           web3.eth.getCoinbase(function(err, account) {

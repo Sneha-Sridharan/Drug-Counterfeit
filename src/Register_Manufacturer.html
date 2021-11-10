@@ -80,7 +80,7 @@
           const retAddress=App1.decryptWithAES(man[2])
           if(retVerId==verifId && retName==manfname && retAddress==address) {
             await App.DrugCounterfiet.registerMan(username, password1)
-            window.location.href="index.html"
+            window.location.href="Login.html"
           }
           else {
             alert("Incorrect Details")

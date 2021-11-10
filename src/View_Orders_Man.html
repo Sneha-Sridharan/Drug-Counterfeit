@@ -1,0 +1,211 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+    <!-- Or: -->
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.js"></script>
+  <link rel="stylesheet" href="styleup2.css">
+</head>
+<body>
+  <div class="color-white">
+    <p id='account'></p>
+  </div>
+  <div class="box">
+  <h2>VIEW ONGOING ORDERS</h2>
+  <div id="loader">
+    <p style="color:white">Loading...</p>
+  </div>
+  <div id="content">
+    <ul id="orderList" class="list-unstyled">
+      <div class='orderTemplate' style="color:white">
+        <pre class='orderId'></pre>
+        <pre class='drugName'></pre>
+        <pre class='quantity'></pre>
+        <pre class='status'></pre>
+        <pre class='manDate'></pre>
+        <pre class='sellDate'></pre>
+        <pre class='sellName'></pre>
+      </div>
+    </ul>
+  </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+    <script>
+      App={
+        loading:false,
+        contracts:{},
+          load: async()=>{
+              await App.loadWeb3()
+              await App.loadContract()
+              await App.render()
+          },
+          loadWeb3: async () => {
+              if (typeof web3 !== 'undefined') {
+                App.web3Provider = web3.currentProvider
+                web3 = new Web3(web3.currentProvider)
+              } else {
+                window.alert("Please connect to Metamask.")
+              }
+              // Modern dapp browsers...
+              if (window.ethereum) {
+                window.web3 = new Web3(ethereum)
+                try {
+                  // Request account access if needed
+                  await ethereum.enable()
+                  // Acccounts now exposed
+                  web3.eth.sendTransaction({/* ... */})
+                } catch (error) {
+                  // User denied account access...
+                }
+              }
+          // Legacy dapp browsers...
+              else if (window.web3) {
+                App.web3Provider = web3.currentProvider
+                window.web3 = new Web3(web3.currentProvider)
+                // Acccounts always exposed
+                web3.eth.sendTransaction({/* ... */})
+              }
+              // Non-dapp browsers...
+              else {
+                console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
+              }
+            },
+            loadContract: async ()=>{
+              const DrugCounterfiet= await $.getJSON('DrugCounterfiet.json')
+              App.contracts.DrugCounterfiet = TruffleContract(DrugCounterfiet)
+              App.contracts.DrugCounterfiet.setProvider(App.web3Provider)
+          
+              // Hydrate the smart contract with values from the blockchain
+              App.DrugCounterfiet = await App.contracts.DrugCounterfiet.deployed()
+            },
+            render:async()=>{
+              web3.eth.getCoinbase(function(err, account) {
+                if(err === null) {
+                  App.account = account;
+                  $('#account').html(App.account)
+                }
+              });
+              if(App.loading){
+                return
+              }
+              App.setLoading(true)
+              await App.renderDrugs()
+              App.setLoading(false)
+            },
+
+            encryptWithAES: (text) => {
+              const passphrase = "gPs"
+              return CryptoJS.AES.encrypt(text, passphrase).toString()
+            },
+
+            decryptWithAES: (ciphertext) => {
+              const passphrase = "gPs";
+              const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+              const originalText = bytes.toString(CryptoJS.enc.Utf8);
+              return originalText;
+            },
+
+            setLoading: (boolean) => {
+              App.loading = boolean
+              const loader = $('#loader')
+              const content = $('#content')
+              if (boolean) {
+                loader.show()
+                content.hide()
+              } else {
+                loader.hide()
+                content.show()
+              }
+            },
+
+            renderDrugs: async () => {
+            // Load the total task count from the blockchain
+              var user=localStorage.getItem("loggedInUser");
+              const ongOrderCount = await App.DrugCounterfiet.viewOngOrdersLength(user,1)
+              var no=ongOrderCount.toNumber();
+              const $drugTemplate = $('.orderTemplate')
+                // Render out each task with a new task template
+              for (var i = 0; i < no; i++) {
+                // Fetch the task data from the blockchain
+                const id = await App.DrugCounterfiet.viewOngOrders(user,i,1)
+                var orderId=id.toNumber();
+                const order = await App.DrugCounterfiet.orders(orderId)
+                const drug=App.decryptWithAES(order[0])
+                const quant=App.decryptWithAES(order[1])
+                const stat=App.decryptWithAES(order[2])
+                const mand=App.decryptWithAES(order[3])
+                const selld=App.decryptWithAES(order[4])
+                const sell=App.decryptWithAES(order[6])
+
+                // Create the html for the task
+                const $newDrugTemplate = $drugTemplate.clone()
+                $newDrugTemplate.find('.orderId').html("Order ID:  "+orderId)
+                $newDrugTemplate.find('.drugName').html("Drug Name:  "+drug)
+                $newDrugTemplate.find('.quantity').html("Quantity:   "+quant)
+                $newDrugTemplate.find('.status').html("Status:   " +stat)
+                if(mand){
+                  $newDrugTemplate.find('.manDate').html("Manufacturing Date:   "+mand)
+                }
+                if(selld){
+                  $newDrugTemplate.find('.sellDate').html("Delivery Date:   "+selld)
+                }
+                $newDrugTemplate.find('.sellName').html("Seller Name:   "+sell)
+                if(stat=="Created") {
+                  $newDrugTemplate.append('<button onClick="App.acceptOrder('+orderId+');">Accept Order</button><button style="margin-left: 20px" onClick="App.rejectOrder('+orderId+','+i+');">Reject Order</button><br><br>')
+                }
+                else {
+                  $newDrugTemplate.append('<br>')
+                }
+                if(stat=="Delivered") {
+                  $newDrugTemplate.append('<button onClick="App.removeOrder('+i+');">Remove Order</button><br><br>')
+                }
+
+                // Put the task in the correct list
+                $('#orderList').append($newDrugTemplate)
+
+                // Show the task
+                $newDrugTemplate.show()
+              }
+            },
+
+            acceptOrder: async (orderId) => {
+              var today = new Date();
+              var dd = String(today.getDate()).padStart(2, '0');
+              var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+              var yyyy = today.getFullYear();
+              today = dd + '/' + mm + '/' + yyyy;
+              var status=App.encryptWithAES("Accepted");
+              var tod=App.encryptWithAES(today);
+              await App.DrugCounterfiet.acceptOrder(orderId,tod,status);
+              alert("Order Accepted");
+              window.location.reload();
+            },
+
+            rejectOrder: async (orderId,id) => {
+              var user=localStorage.getItem("loggedInUser");
+              var status=App.encryptWithAES("Rejected");
+              await App.DrugCounterfiet.rejectOrder(orderId,status,id,user);
+              alert("Order Rejected");
+              window.location.reload();
+            },
+
+            removeOrder: async (id) => {
+              var user=localStorage.getItem("loggedInUser");
+              await App.DrugCounterfiet.removeOrder(user,id,1);
+              alert("Order Removed");
+              window.location.reload();
+            }
+      }
+      $(()=>{
+          $(window).load(()=>{
+              App.load()
+          })
+      })
+    </script>
+    </body>
+</html>
