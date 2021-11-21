@@ -67,8 +67,8 @@ contract DrugCounterfiet
     );
 
     event orderUpdate(
-        string status,
-		string date
+        string date,
+		string status
     );
 
     function createManufacturer(uint _regid, string memory _verificationId, string memory _name, string memory _location) public{
@@ -76,7 +76,6 @@ contract DrugCounterfiet
         manufacturers[_regid].name=_name;
         manufacturers[_regid].location=_location;
         emit ManufacturerCreated(_verificationId,_name,_location);
-
     }
 
     function viewOngOrdersLength(uint _regid, uint _type) public view returns (uint){
